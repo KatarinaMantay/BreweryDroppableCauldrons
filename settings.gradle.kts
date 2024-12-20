@@ -1,2 +1,2 @@
-rootProject.name = "BreweryBetterCauldrons"
+rootProject.name = "BreweryDroppableCauldrons"
 
