@@ -41,7 +41,7 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
     public void onPlayerDropItem(PlayerDropItemEvent e) {
         Item droppedItem = e.getItemDrop();
 
-        UniversalRunnable runnable = new UniversalRunnable() {
+        new UniversalRunnable() {
             private int runnableTicks = 0;
 
             @Override
@@ -66,8 +66,6 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
                     });
                 }
             }
-        };
-
-        BreweryPlugin.getScheduler().runTaskTimerAsynchronously(runnable, 1L, 1L);
+        }.runTaskTimerAsynchronously(getBreweryPlugin(), 1L, 1L);
     }
 }
