@@ -4,6 +4,7 @@ import com.dre.brewery.BCauldron;
 import com.dre.brewery.BreweryPlugin;
 import com.dre.brewery.api.addons.AddonInfo;
 import com.dre.brewery.api.addons.BreweryAddon;
+import com.dre.brewery.depend.universalScheduler.UniversalRunnable;
 import com.dre.brewery.utility.MaterialUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -14,7 +15,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.scheduler.BukkitRunnable;
 
 // Idea:
 // Listen for dropped items, check if the item is in a BCauldron block when it hits the ground <-- Needs a runnable for this?
@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 // ALSO: Add config option to disable adding items by interacting with the cauldron? <-- Might not be possible within an addon, would have to manually edit BreweryX for this.
 @AddonInfo(
         name = "DroppableCauldrons",
-        version = "1.0",
+        version = "1.1",
         description = "Allows players to drop ingredients into BreweryX cauldrons and adds them as ingredients.",
         author = "Jsinco & Kataray"
 )
@@ -41,8 +41,9 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
     public void onPlayerDropItem(PlayerDropItemEvent e) {
         Item droppedItem = e.getItemDrop();
 
-        new BukkitRunnable() {
-            int runnableTicks = 0;
+        UniversalRunnable runnable = new UniversalRunnable() {
+            private int runnableTicks = 0;
+
             @Override
             public void run() {
                 Location loc = droppedItem.getLocation();
@@ -63,7 +64,8 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
                     });
                 }
             }
-        }.runTaskTimerAsynchronously(BreweryPlugin.getInstance(), 1L, 1L);
-    }
+        };
 
+        BreweryPlugin.getScheduler().runTaskTimer(droppedItem.getLocation(), runnable, 1L, 1L);
+    }
 }
