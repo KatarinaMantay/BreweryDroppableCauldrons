@@ -47,7 +47,7 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
             @Override
             public void run() {
                 Location loc = droppedItem.getLocation();
-                if ((runnableTicks++ > MAX_RUNNABLE_TICKS || droppedItem.isDead())) {
+                if (runnableTicks++ > MAX_RUNNABLE_TICKS || droppedItem.isDead()) {
                     this.cancel();
                 } else if (MaterialUtil.isWaterCauldron(loc.getBlock().getType())) {
                     PlayerInteractEvent fakeInteractEvent = new PlayerInteractEvent(
@@ -58,7 +58,9 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
                             BlockFace.UP,
                             EquipmentSlot.HAND
                     );
-                    org.bukkit.Bukkit.getScheduler().runTask(BreweryPlugin.getInstance(), () -> {
+
+
+                    BreweryPlugin.getScheduler().runTask(droppedItem.getLocation(), () -> {
                         BCauldron.clickCauldron(fakeInteractEvent);
                         droppedItem.remove();
                     });
@@ -66,6 +68,6 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
             }
         };
 
-        BreweryPlugin.getScheduler().runTaskTimer(droppedItem.getLocation(), runnable, 1L, 1L);
+        BreweryPlugin.getScheduler().runTaskTimerAsynchronously(runnable, 1L, 1L);
     }
 }
