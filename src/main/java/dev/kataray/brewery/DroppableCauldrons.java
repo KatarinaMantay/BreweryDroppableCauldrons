@@ -1,9 +1,11 @@
 package dev.kataray.brewery;
 
 import com.dre.brewery.BCauldron;
+import com.dre.brewery.BIngredients;
 import com.dre.brewery.BreweryPlugin;
 import com.dre.brewery.api.addons.AddonInfo;
 import com.dre.brewery.api.addons.BreweryAddon;
+import com.dre.brewery.recipe.BCauldronRecipe;
 import com.dre.brewery.utility.MaterialUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -14,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 // Idea:
 // Listen for dropped items, check if the item is in a BCauldron block when it hits the ground <-- Needs a runnable for this?
@@ -37,6 +40,13 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent e) {
         Item droppedItem = e.getItemDrop();
+        ItemStack itemStack = droppedItem.getItemStack();
+
+        // Quick check if it's even a possible ingredient
+        if (!BCauldronRecipe.acceptedMaterials.contains(itemStack.getType()) && !itemStack.hasItemMeta()) {
+            return;
+        }
+
         final int[] ticks = {0};
 
         BreweryPlugin.getScheduler().runTaskTimer(droppedItem.getLocation(), () -> {
@@ -45,11 +55,18 @@ public class DroppableCauldrons extends BreweryAddon implements Listener {
                 return;
             }
 
-            if (MaterialUtil.isWaterCauldron(loc.getBlock().getType())) {
+            if (MaterialUtil.isWaterCauldron(loc.getBlock().getType()) &&
+                    MaterialUtil.getFillLevel(loc.getBlock()) > 0) {
+
+                // Check if it's a valid ingredient for the cauldron
+                if (!BCauldron.ingredientAdd(loc.getBlock(), itemStack, e.getPlayer())) {
+                    return;
+                }
+
                 PlayerInteractEvent fakeInteractEvent = new PlayerInteractEvent(
                         e.getPlayer(),
                         Action.RIGHT_CLICK_BLOCK,
-                        droppedItem.getItemStack().clone(),
+                        itemStack.clone(),
                         loc.getBlock(),
                         BlockFace.UP,
                         EquipmentSlot.HAND
