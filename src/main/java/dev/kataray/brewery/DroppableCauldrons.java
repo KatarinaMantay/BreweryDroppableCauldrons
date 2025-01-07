@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 // ALSO: Add config option to disable adding items by interacting with the cauldron? <-- Might not be possible within an addon, would have to manually edit BreweryX for this.
 @AddonInfo(
         name = "DroppableCauldrons",
-        version = "1.2",
+        version = "1.3",
         description = "Allows players to drop ingredients into BreweryX cauldrons and adds them as ingredients.",
         author = "Jsinco & Kataray"
 )
